@@ -1,0 +1,292 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Add Font Awesome Icon Library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        button#uploadButton {
+            margin-top: 4px;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        form {
+            width: 80%;
+            margin-bottom: 1rem;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        #progressText {
+            display: none;
+            margin-top: 1rem;
+            text-align: center;
+        }
+        .custom-file-input {
+            cursor: pointer;
+        }
+        .custom-file-label {
+            background-color: #f8f9fa;
+            color: rgba(0, 0, 0, 0.3); /* 设置文本颜色为带透明度的黑色 */
+        }
+        .custom-file-label::after {
+            content: "浏览";
+        }
+        /* Additional CSS for the switch button */
+        #switchButton {
+            background: none;
+            border: none;
+            color: #007bff; /* Same color as primary bootstrap color */
+            font-size: 1.2rem; /* Adjust the size of the icon */
+            cursor: pointer; /* Change cursor to pointer when hovering over the icon */
+            margin-top: 40px; /* Space between the switch button and the upload button */
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+        }
+        #textInput::placeholder {
+            /* 调整文本框占位符的透明度 */
+            opacity: 0.5;
+        }
+        h2 {
+            font-size: 2em; /* 增加字体大小 */
+<!--            color: #007bff; /* 使用 Bootstrap 主题颜色 */-->
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* 添加轻微的阴影效果 */
+            font-weight: bold; /* 字体加粗 */
+            margin-bottom: 1rem; /* 调整下方边距 */
+            text-align: center; /* 居中对齐 */
+        }
+        .text-actions {
+            margin-top: 10px;
+            text-align: center; /* 按钮居中对齐 */
+        }
+
+        .text-actions .btn {
+            margin-left: 5px; /* 按钮之间的间距 */
+            border-radius: 5px;
+            box-shadow: none;
+            padding: 5px 15px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-copy, .btn-danger {
+            background-color: transparent !important; /* Transparent background */
+            color: #808080; /* Gray text */
+            border-color: transparent !important; /* Transparent border */
+        }
+
+        .btn-copy:active, .btn-copy:focus, .btn-danger:active, .btn-danger:focus {
+            background-color: transparent !important; /* Transparent background */
+            border-color: transparent !important; /* Transparent border */
+            box-shadow: none !important; /* Remove box shadow */
+            outline: none !important; /* Remove outline */
+        }
+
+        .btn-copy i, .btn-danger i {
+            color: #808080 !important; /* Keep the icon color as gray */
+        }
+
+        .text-container {
+            position: relative;
+        }
+
+        #textInput {
+            width: 100%;
+        }
+
+        .btn-clear {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            background-color: transparent; /* 透明背景 */
+            color: rgba(0, 0, 0, 0.5); /* 透明度较高的黑色 */
+            border: none; /* 无边框 */
+            width: 20px;
+            height: 20px;
+            padding: 0;
+            display: none; /* 默认不显示 */
+            cursor: pointer;
+        }
+        .text-container {
+            margin-top: 4px; /*你可以根据实际需要调整这个值*/
+        }
+
+        .text-actions .btn {
+            margin-left: 5px; /* 按钮之间的间距 */
+            border-radius: 5px; /* 稍微圆角的边框 */
+            box-shadow: none; /* 移除阴影效果 */
+            padding: 5px 15px; /* 内边距 */
+            font-size: 16px; /* 字体大小 */
+            transition: background-color 0.3s; /* 平滑的背景颜色过渡效果 */
+        }
+
+        .btn-refresh, .btn-copy, .btn-danger {
+            background-color: transparent !important; /* Transparent background */
+            color: #808080; /* Gray text */
+            border-color: transparent !important; /* Transparent border */
+        }
+
+        .btn-refresh:active, .btn-refresh:focus, .btn-copy:active, .btn-copy:focus, .btn-danger:active, .btn-danger:focus {
+            background-color: transparent !important; /* Transparent background */
+            border-color: transparent !important; /* Transparent border */
+            box-shadow: none !important; /* Remove box shadow */
+            outline: none !important; /* Remove outline */
+        }
+
+        .btn-refresh i, .btn-copy i, .btn-danger i {
+            color: #808080 !important; /* Keep the icon color as gray */
+        }
+
+        body, html {
+            height: 100%;
+            overflow: hidden;
+        }
+
+
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <form id="uploadForm" method="post" enctype="multipart/form-data">
+        <h2>文件传输助手</h2>
+        <div class="custom-file">
+            <input type="file" class="custom-file-input" id="customFile" name="file" multiple onchange="updateLabel()">
+            <label class="custom-file-label" for="customFile" id="customFileLabel">选择文件</label>
+        </div>
+        <div class="text-container">
+            <textarea class="form-control" id="textInput" name="text" placeholder="输入文本内容" rows="10"></textarea>
+        </div>
+
+        <div class="text-actions">
+            <button type="button" class="btn btn-refresh" id="getTextButton">
+                <i class="fas fa-sync-alt"></i> <!-- 刷新图标 -->
+            </button>
+            <button type="button" class="btn btn-copy" id="copyButton">
+                <i class="fas fa-copy"></i> <!-- 复制图标 -->
+            </button>
+            <button type="button" class="btn btn-danger" id="deleteButton">
+                <i class="fas fa-trash-alt"></i> <!-- 删除图标 -->
+            </button>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="uploadButton">上传</button>
+
+        <p id="progressText">0%</p>
+
+        <!-- Switch button -->
+        <div id="switchButton" onclick="window.location.href='/download'">
+            <i class="fas fa-exchange-alt"></i>
+        </div>
+    </form>
+
+</div>
+
+<script>
+        // 添加删除按钮的事件监听器
+        document.getElementById('deleteButton').addEventListener('click', function() {
+            document.getElementById('textInput').value = '';
+        });
+
+        document.getElementById('copyButton').addEventListener('click', function() {
+            var textInput = document.getElementById('textInput');
+            var text = textInput.value.trim();
+            if (text !== '') {
+                var tempTextArea = document.createElement('textarea');
+                tempTextArea.style.position = 'absolute';
+                tempTextArea.style.left = '-9999px';
+                tempTextArea.value = text;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempTextArea);
+                Swal.fire({
+                    html: '<span style="font-size: 20px;">文本复制成功</span>',
+        <!--            icon: 'success',-->
+                    timer: 500,
+                    showConfirmButton: false,
+                    width: '60%', // 设置弹窗大小
+                });
+            } else {
+                Swal.fire({
+                    html: '<span style="font-size: 20px;">复制失败</span>',
+        <!--            icon: 'warning',-->
+                    timer: 500,
+                    showConfirmButton: false,
+                    width: '60%' // 设置弹窗大小
+                });
+            }
+        });
+
+
+        function updateLabel() {
+            var inputFile = document.getElementById('customFile');
+            var label = document.getElementById('customFileLabel');
+            var fileCount = inputFile.files.length;
+            label.innerHTML = '已选择 ' + fileCount + ' 个文件';
+        }
+
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var uploadButton = document.getElementById('uploadButton');
+            uploadButton.innerHTML = '上传中...'; // 更改按钮文本
+            uploadButton.setAttribute('disabled', 'disabled'); // 禁用按钮
+
+            var progressText = document.getElementById('progressText');
+            progressText.style.display = 'block'; // 显示进度文本
+            progressText.innerHTML = '上传进度: 0%'; // 初始设置进度为0%
+
+            var formData = new FormData(this);
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/', true);
+
+            xhr.upload.addEventListener('progress', function(e) {
+                if (e.lengthComputable) {
+                    var percentComplete = Math.round(e.loaded / e.total * 100);
+                    progressText.innerHTML = '上传进度: ' + percentComplete + '%'; // 更新进度文本
+                }
+            });
+
+            xhr.onload = function() {
+                uploadButton.innerHTML = '上传'; // 恢复按钮文本
+                uploadButton.removeAttribute('disabled'); // 启用按钮
+                progressText.style.display = 'none'; // 隐藏进度文本
+
+                if (xhr.status === 204) {
+                    Swal.fire({
+                        title: '上传成功',
+                        icon: 'success',
+                        confirmButtonText: '确定',
+                        width: '70%' // 设置弹窗大小
+                    });
+                } else {
+                    Swal.fire({
+                        title: '上传异常',
+                        icon: 'error',
+                        confirmButtonText: '确定',
+                        width: '70%' // 设置弹窗大小
+                    });
+                }
+            };
+
+            xhr.send(formData);
+        });
+
+document.getElementById('getTextButton').addEventListener('click', function() {
+    fetch('/get_txt')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('textInput').value = data;
+        });
+});
+
+</script>
+</body>
+</html>

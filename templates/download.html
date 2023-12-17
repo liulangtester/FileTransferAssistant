@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>下载页面</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        .container {
+            padding-top: 10px;
+        }
+        .table {
+            margin-bottom: 15px;
+        }
+        .file-icon {
+            font-size: 1em;
+            margin-right: 5px;
+        }
+        .file-row {
+            cursor: pointer;
+        }
+        .file-name {
+            vertical-align: middle;
+            display: flex;
+            align-items: center;
+        }
+        .back-icon, #switchButton {
+            font-size: 1em;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: #007bff;
+            padding: 5px 15px; /* 增加左右的内边距 */
+            line-height: 1;
+        }
+        .file-size {
+            font-size: 0.85em;
+            margin-left: 10px;
+            color: #6c757d; /* Bootstrap secondary text color */
+        }
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px; /* 增加容器的左右内边距 */
+            margin-top: 20px; /* 增加顶部边距 */
+        }
+        .header-row h1 {
+            flex-grow: 1;
+            text-align: center;
+            margin: 0;
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-row">
+        <button class="back-icon" onclick="window.history.back()">&lt;</button>
+        <h1>下载页面</h1>
+        <div id="switchButton" onclick="window.location.href='/'">
+            <i class="fas fa-exchange-alt"></i>
+        </div>
+    </div>
+    <div class="container">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">文件列表</th>
+                </tr>
+            </thead>
+                <tbody>
+                    {% for file in files %}
+                    <tr class="file-row" onclick="{{ file.is_dir and 'window.location.href=\'' + url_for('download_page', path=file.path) + '\'' or 'window.location.href=\'' + url_for('download_file', filename=file.path) + '\'' }}">
+                        <td class="file-name">
+                            <span class="file-icon">{{ file.is_dir and '📁' or '📄' }}</span>
+                            {{ file.name }}
+                            {% if not file.is_dir %}
+                                <span class="file-size">({{ file.size }} {{ file.unit }})</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+        </table>
+    </div>
+</body>
+</html>
