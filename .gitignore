@@ -1,3 +1,7 @@
 .DS_Store
 /.idea/
 /tools/__pycache__/
+dist/
+build/
+app.spec
+text.txt

@@ -114,8 +114,9 @@ def upload_file():
             for file in files:
                 file_path = os.path.join(save_file_path, file.filename)
                 file.save(file_path)
-            print(f'【文件上传成功】 - - 文件数量：{len(files)}')
-            # video_compress.process_video(file_path, target_fraction=0.5)
+                print(f'【文件上传成功】 - - 文件路径：{file_path}')
+                # print(f'【文件上传成功】 - - 文件数量：{len(files)}')
+                video_compress.process_video(file_path)
             # print('压缩成功====')
             return '', 204
         elif not files[0] and text:
