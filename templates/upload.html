@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Add Font Awesome Icon Library -->
@@ -150,6 +150,16 @@
             overflow: hidden;
         }
 
+        body {
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+             -khtml-user-select: none; /* Konqueror HTML */
+               -moz-user-select: none; /* Firefox */
+                -ms-user-select: none; /* Internet Explorer/Edge */
+                    user-select: none; /* Non-prefixed version, currently
+                                        supported by Chrome and Opera */
+        }
+
 
 
     </style>
@@ -190,9 +200,62 @@
 </div>
 
 <script>
+        document.addEventListener('click', function(event) {
+            var isInsideInput = event.target.matches('input, textarea');
+            if (!isInsideInput) {
+                var focusElement = document.activeElement;
+                if (focusElement && (focusElement.tagName === 'INPUT' || focusElement.tagName === 'TEXTAREA')) {
+                    focusElement.blur();
+                }
+            }
+        });
+
+        window.addEventListener('touchstart', function (event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+
+        var lastTouchEnd = 0;
+        window.addEventListener('touchend', function (event) {
+            var now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, { passive: false });
+
+        function checkInputs() {
+            var uploadButton = document.getElementById('uploadButton');
+            var fileInput = document.getElementById('customFile');
+            var textInput = document.getElementById('textInput');
+
+            // 文件输入是否有值
+            var fileHasValue = fileInput.value !== '';
+            // 文本输入是否有值
+            var textHasValue = textInput.value.trim() !== '';
+
+            if (fileHasValue || textHasValue) {
+                // 如果文件输入或文本输入有值，启用上传按钮
+                uploadButton.removeAttribute('disabled');
+            } else {
+                // 否则，禁用上传按钮
+                uploadButton.setAttribute('disabled', 'disabled');
+            }
+        }
+
+        // 为文件输入和文本输入添加事件监听器
+        document.getElementById('customFile').addEventListener('change', checkInputs);
+        document.getElementById('textInput').addEventListener('input', checkInputs);
+
+        // 页面加载时执行一次检查
+        checkInputs();
+
+
         // 添加删除按钮的事件监听器
         document.getElementById('deleteButton').addEventListener('click', function() {
             document.getElementById('textInput').value = '';
+            checkInputs();
         });
 
         document.getElementById('copyButton').addEventListener('click', function() {
@@ -216,7 +279,7 @@
                 });
             } else {
                 Swal.fire({
-                    html: '<span style="font-size: 20px;">复制失败</span>',
+                    html: '<span style="font-size: 20px;">文本复制失败</span>',
         <!--            icon: 'warning',-->
                     timer: 500,
                     showConfirmButton: false,
@@ -258,6 +321,13 @@
                 uploadButton.innerHTML = '上传'; // 恢复按钮文本
                 uploadButton.removeAttribute('disabled'); // 启用按钮
                 progressText.style.display = 'none'; // 隐藏进度文本
+                // 重置上传组件
+                var inputElement = document.getElementById('customFile');
+                var labelElement = document.getElementById('customFileLabel');
+                inputElement.value = null;
+                labelElement.textContent = "选择文件";
+                // 重置上传按钮
+                checkInputs();
 
                 if (xhr.status === 204) {
                     Swal.fire({
@@ -284,6 +354,7 @@ document.getElementById('getTextButton').addEventListener('click', function() {
         .then(response => response.text())
         .then(data => {
             document.getElementById('textInput').value = data;
+            checkInputs();
         });
 });
 

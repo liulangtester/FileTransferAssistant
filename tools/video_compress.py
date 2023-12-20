@@ -24,6 +24,13 @@ def remove_black_borders(input_file, analysis_duration=2):
         current_path = os.path.dirname(os.path.realpath(__file__))
     directory = os.path.join(current_path, 'ffmpeg')
 
+    # # 兼容打包和不打包的情况，使用绝对目录拼接子目录
+    # if getattr(sys, 'frozen', False):
+    #     current_path = sys._MEIPASS
+    # else:
+    #     current_path = os.path.dirname(os.path.abspath(__file__))
+    # directory = os.path.join(current_path, 'tools/ffmpeg')
+
     ffmpeg_command = [
         directory, "-i", input_file, "-t", str(analysis_duration),
         "-vf", "cropdetect", "-f", "null", "-"
@@ -119,8 +126,8 @@ def convert_to_mp4(input_file, output_file):
     :param input_file: 需要转换的视频文件的路径（字符串）
     :param output_file: 转换后的MP4文件的路径（字符串）
     """
-    print('convert_to_mp4', input_file)
-    print('convert_to_mp4', output_file)
+    print('convert_to_mp4_input_file', input_file)
+    print('convert_to_mp4_output_file', output_file)
     if getattr(sys, 'frozen', False):
         current_path = os.path.dirname(sys.executable)
     else:
@@ -179,8 +186,9 @@ def compress_video(input_file, target_fraction):
 
 # 判断是否为视频文件
 def is_video_file(file_path):
-    # 提取文件扩展名
-    extension = os.path.splitext(file_path)[1]
+    # 提取文件扩展名并转换为小写
+    extension = os.path.splitext(file_path)[1].lower()
+    # print('文件扩展名', extension)
     # 定义视频文件扩展名的列表
     video_extensions = ['.mp4', '.avi', '.mov', '.mkv', '.flv', '.wmv']
     # 检查文件扩展名是否在视频文件扩展名的列表中
@@ -215,7 +223,9 @@ def process_video(input_file):
         print('process_video', input_file)
         if not (input_file.endswith('.mp4') or input_file.endswith('.mov')):
             temp_output = os.path.splitext(input_file)[0] + "_temp.mp4"
+            print("转mp4 1")
             convert_to_mp4(input_file, temp_output)
+            print("转mp4 2")
             input_file = temp_output
         print("去黑边1")
         print("input_file", input_file)
@@ -248,7 +258,8 @@ def process_video(input_file):
                 return output_file_compress
             except Exception:
                 traceback.print_exc()
-
+    else:
+        print("文件不是视频文件，无需处理")
 
 # if __name__ == '__main__':
 #     input_file = "phone_to_pc/RPReplay_Final1702747412222.mov"

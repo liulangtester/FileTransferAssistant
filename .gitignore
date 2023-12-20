@@ -5,3 +5,5 @@ dist/
 build/
 app.spec
 text.txt
+phone_to_pc/
+pc_to_phone/
