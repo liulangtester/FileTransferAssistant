@@ -99,15 +99,19 @@ def upload_file():
             return '文件列表为空、文本内容为空', 403
         elif files[0] and text:
             # 文件列表和文本都不为空，文件和文本都上传
-            for file in files:
-                file_path = os.path.join(save_file_path, file.filename)
-                file.save(file_path)
-
             with open(save_text_path, 'w') as f:
                 f.write(text)
 
-            print(f'【文件上传 - 完成】 - - 文件数量：{len(files)}')
+            for file in files:
+                file_path = os.path.join(save_file_path, file.filename)
+                file.save(file_path)
+                print(f'【视频压缩 - 开始】 - - 文件路径：{file_path}')
+                output_path = video_compress.process_video(file_path)
+                print(f'【视频压缩 - 完成】 - - 文件路径：{output_path}')
+
             print(f'【文本上传 - 完成】 - - 文本内容：{text}')
+            print(f'【文件上传 - 完成】 - - 文件数量：{len(files)}')
+
             return '', 204
         elif files[0] and not text:
             # 文本内容为空，只上传文件
@@ -116,9 +120,9 @@ def upload_file():
                 print(f'【文件上传 - 开始】 - - 文件路径：{file_path}')
                 file.save(file_path)
                 print(f'【文件上传 - 完成】 - - 文件路径：{file_path}')
-                print(f'【文件压缩 - 开始】 - - 文件路径：{file_path}')
+                print(f'【视频压缩 - 开始】 - - 文件路径：{file_path}')
                 output_path = video_compress.process_video(file_path)
-                print(f'【文件压缩 - 完成】 - - 文件路径：{output_path}')
+                print(f'【视频压缩 - 完成】 - - 文件路径：{output_path}')
             return '', 204
         elif not files[0] and text:
             # 文件列表为空，只上传文本
