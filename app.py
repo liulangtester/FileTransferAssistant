@@ -106,8 +106,8 @@ def upload_file():
             with open(save_text_path, 'w') as f:
                 f.write(text)
 
-            print(f'【文件上传 - 成功】 - - 文件数量：{len(files)}')
-            print(f'【文本上传 - 成功】 - - 文本内容：{text}')
+            print(f'【文件上传 - 完成】 - - 文件数量：{len(files)}')
+            print(f'【文本上传 - 完成】 - - 文本内容：{text}')
             return '', 204
         elif files[0] and not text:
             # 文本内容为空，只上传文件
@@ -115,21 +115,21 @@ def upload_file():
                 file_path = os.path.join(save_file_path, file.filename)
                 print(f'【文件上传 - 开始】 - - 文件路径：{file_path}')
                 file.save(file_path)
-                print(f'【文件上传 - 成功】 - - 文件路径：{file_path}')
+                print(f'【文件上传 - 完成】 - - 文件路径：{file_path}')
                 print(f'【文件压缩 - 开始】 - - 文件路径：{file_path}')
-                video_compress.process_video(file_path)
-            # print('压缩成功====')
+                output_path = video_compress.process_video(file_path)
+                print(f'【文件压缩 - 完成】 - - 文件路径：{output_path}')
             return '', 204
         elif not files[0] and text:
             # 文件列表为空，只上传文本
             with open(save_text_path, 'w') as f:
                 f.write(text)
-            print(f'【文本上传 - 成功】 - - 文本内容：{text}')
+            print(f'【文本上传 - 完成】 - - 文本内容：{text}')
             return '', 204
         else:
             print('【文件上传 - 失败】 - - 未知错误')
             print('【文本上传 - 失败】 - - 未知错误')
-            return '未知错误', 403
+            return 'upload_file：未知错误', 403
     else:
         return render_template('upload.html')
 
