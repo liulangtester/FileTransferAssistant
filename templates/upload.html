@@ -43,10 +43,10 @@
         #switchButton {
             background: none;
             border: none;
-            color: #007bff; /* Same color as primary bootstrap color */
-            font-size: 1.2rem; /* Adjust the size of the icon */
-            cursor: pointer; /* Change cursor to pointer when hovering over the icon */
-            margin-top: 40px; /* Space between the switch button and the upload button */
+            color: #007bff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-top: 40px;
             display: inline-block;
             width: 100%;
             text-align: center;
@@ -160,6 +160,24 @@
                                         supported by Chrome and Opera */
         }
 
+        .btn-paste {
+    background-color: transparent !important; /* Transparent background */
+    color: #808080; /* Gray text */
+    border-color: transparent !important; /* Transparent border */
+}
+
+.btn-paste:active,
+.btn-paste:focus {
+    background-color: transparent !important; /* Transparent background */
+    border-color: transparent !important; /* Transparent border */
+    box-shadow: none !important; /* Remove box shadow */
+    outline: none !important; /* Remove outline */
+}
+
+.btn-paste i {
+    color: #808080 !important; /* Keep the icon color as gray */
+}
+
 
 
     </style>
@@ -183,6 +201,9 @@
             <button type="button" class="btn btn-copy" id="copyButton">
                 <i class="fas fa-copy"></i> <!-- 复制图标 -->
             </button>
+            <button type="button" class="btn btn-paste" id="pasteButton">
+                <i class="fas fa-paste"></i> <!-- 粘贴图标 -->
+            </button>
             <button type="button" class="btn btn-danger" id="deleteButton">
                 <i class="fas fa-trash-alt"></i> <!-- 删除图标 -->
             </button>
@@ -192,14 +213,25 @@
         <p id="progressText">0%</p>
 
         <!-- Switch button -->
-        <div id="switchButton" onclick="window.location.href='/download'">
-            <i class="fas fa-exchange-alt"></i>
+        <div id="switchButton">
+            <i class="fas fa-exchange-alt" id="switchButton-icon" onclick="window.location.href='/download'"></i>
         </div>
     </form>
 
 </div>
 
 <script>
+document.getElementById('pasteButton').addEventListener('click', function() {
+    navigator.clipboard.readText()
+        .then(text => {
+            document.getElementById('textInput').value = text;
+            checkInputs();
+        })
+        .catch(err => {
+            console.error('Failed to read clipboard contents: ', err);
+        });
+});
+
         document.addEventListener('click', function(event) {
             var isInsideInput = event.target.matches('input, textarea');
             if (!isInsideInput) {
@@ -271,21 +303,22 @@
                 document.execCommand('copy');
                 document.body.removeChild(tempTextArea);
                 Swal.fire({
-                    html: '<span style="font-size: 20px;">文本复制成功</span>',
-        <!--            icon: 'success',-->
-                    timer: 500,
+                    html: '<span style="font-size: 20px;">复制成功</span>',
+                    icon: 'success',
+                    timer: 700,
                     showConfirmButton: false,
                     width: '60%', // 设置弹窗大小
                 });
-            } else {
-                Swal.fire({
-                    html: '<span style="font-size: 20px;">文本复制失败</span>',
-        <!--            icon: 'warning',-->
-                    timer: 500,
-                    showConfirmButton: false,
-                    width: '60%' // 设置弹窗大小
-                });
             }
+<!--            else {-->
+<!--                Swal.fire({-->
+<!--                    html: '<span style="font-size: 20px;">文本复制失败</span>',-->
+<!--        &lt;!&ndash;            icon: 'warning',&ndash;&gt;-->
+<!--                    timer: 500,-->
+<!--                    showConfirmButton: false,-->
+<!--                    width: '60%' // 设置弹窗大小-->
+<!--                });-->
+<!--            }-->
         });
 
 
@@ -355,6 +388,10 @@ document.getElementById('getTextButton').addEventListener('click', function() {
         .then(data => {
             document.getElementById('textInput').value = data;
             checkInputs();
+            // 使用 setTimeout 来延迟0.5秒，然后模拟点击复制按钮
+            setTimeout(function() {
+                document.getElementById('copyButton').click();
+            }, 500);  // 500 毫秒等于0.5秒
         });
 });
 

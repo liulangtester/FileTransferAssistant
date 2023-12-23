@@ -4,6 +4,9 @@ import socket
 import sys
 import traceback
 import pyqrcode
+import pyperclip
+
+
 from tools import video_compress
 from flask import Flask, request, render_template, send_from_directory
 
@@ -17,12 +20,13 @@ else:
     current_path = os.path.dirname(os.path.realpath(__file__))
 
 def run():
-    create_directory(pc_to_phone)
-    create_directory(phone_to_pc)
-    create_file(os.path.join(current_path, 'text.txt'))
-    host_ip = get_host_ip()
-    port = 5000
     try:
+        create_directory(pc_to_phone)
+        create_directory(phone_to_pc)
+        create_file(os.path.join(current_path, 'text.txt'))
+        host_ip = get_host_ip()
+        port = 5000
+
         if is_port_in_use(port):
             url = pyqrcode.create(f'http://{host_ip}:{port}', version=2, error='L')
             qr_doble(url.text())
@@ -35,6 +39,7 @@ def run():
             app.run(host=host_ip, port=port)
     except Exception:
         traceback.print_exc()
+        write_txt(os.path.join(current_path, 'text.txt'), traceback.print_exc())
 
 def create_directory(directory_name):
     directory = os.path.join(current_path, directory_name)
@@ -43,7 +48,7 @@ def create_directory(directory_name):
 
 def create_file(path):
     if not os.path.isfile(path):
-        with open(path, 'w') as file:
+        with open(path, 'w', encoding='utf-8') as file:
             file.write('')
 
 def get_host_ip():
@@ -72,10 +77,22 @@ def get_txt():
     path = os.path.join(current_path, 'text.txt')
     # 如果文件不存在则创建一个空文件
     create_file(path)
+
     # 读取文件内容
-    with open(path, 'r') as file:
+    with open(path, 'r', encoding='utf-8') as file:
         data = file.read()
     return data
+
+def write_txt(filename, data):
+    try:
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write(data)
+
+        # 将文本复制到剪切板
+        pyperclip.copy(data)
+
+    except Exception as e:
+        print(f"文件写入错误: {e}")
 
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
@@ -99,13 +116,12 @@ def upload_file():
             return '文件列表为空、文本内容为空', 403
         elif files[0] and text:
             # 文件列表和文本都不为空，文件和文本都上传
-            with open(save_text_path, 'w') as f:
-                f.write(text)
+            write_txt(save_text_path, text)
 
             for file in files:
                 file_path = os.path.join(save_file_path, file.filename)
                 file.save(file_path)
-                print(f'【视频压缩 - 开始】 - - 文件路径：{file_path}')
+                # print(f'【视频压缩 - 开始】 - - 文件路径：{file_path}')
                 output_path = video_compress.process_video(file_path)
                 print(f'【视频压缩 - 完成】 - - 文件路径：{output_path}')
 
@@ -117,17 +133,16 @@ def upload_file():
             # 文本内容为空，只上传文件
             for file in files:
                 file_path = os.path.join(save_file_path, file.filename)
-                print(f'【文件上传 - 开始】 - - 文件路径：{file_path}')
+                # print(f'【文件上传 - 开始】 - - 文件路径：{file_path}')
                 file.save(file_path)
                 print(f'【文件上传 - 完成】 - - 文件路径：{file_path}')
-                print(f'【视频压缩 - 开始】 - - 文件路径：{file_path}')
+                # print(f'【视频压缩 - 开始】 - - 文件路径：{file_path}')
                 output_path = video_compress.process_video(file_path)
                 print(f'【视频压缩 - 完成】 - - 文件路径：{output_path}')
             return '', 204
         elif not files[0] and text:
             # 文件列表为空，只上传文本
-            with open(save_text_path, 'w') as f:
-                f.write(text)
+            write_txt(save_text_path, text)
             print(f'【文本上传 - 完成】 - - 文本内容：{text}')
             return '', 204
         else:

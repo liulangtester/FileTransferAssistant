@@ -1,5 +1,4 @@
 import sys
-import traceback
 import cv2
 import subprocess
 import os
