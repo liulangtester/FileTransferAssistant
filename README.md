@@ -1,4 +1,6 @@
 背景：平时测试会用到很多台手机，每次要将文件传输到PC端需要使用第三方APP（微信、QQ、如流等）作为媒介传输文件，太麻烦了，也不是每台手机都会安装微信、QQ啥的。我需要的是轻量化的文件传输工具，先去网上找了下，发现有类似的工具，但是如视频需要自动压缩到10M以内等需求还是不能满足，所以决定还是自己写一个~
+
+
 脚本打包：
 * pyinstaller --onefile --add-binary 'tools/ffmpeg.exe;.' --add-binary 'tools/ffprobe.exe;.' app.py  --add-data 'templates/;templates'
 
