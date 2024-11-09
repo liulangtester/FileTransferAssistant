@@ -4,3 +4,4 @@ pyperclip
 pypng
 Pillow
 opencv-python
+pyinstaller
