@@ -10,3 +10,4 @@ opencv-python==4.8.1.78
 PyQRCode==1.2.1
 werkzeug==3.0.1
 zipp==3.17.0
+pyperclip

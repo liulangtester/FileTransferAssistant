@@ -201,9 +201,6 @@
             <button type="button" class="btn btn-copy" id="copyButton">
                 <i class="fas fa-copy"></i> <!-- 复制图标 -->
             </button>
-            <button type="button" class="btn btn-paste" id="pasteButton">
-                <i class="fas fa-paste"></i> <!-- 粘贴图标 -->
-            </button>
             <button type="button" class="btn btn-danger" id="deleteButton">
                 <i class="fas fa-trash-alt"></i> <!-- 删除图标 -->
             </button>
@@ -221,17 +218,6 @@
 </div>
 
 <script>
-document.getElementById('pasteButton').addEventListener('click', function() {
-    navigator.clipboard.readText()
-        .then(text => {
-            document.getElementById('textInput').value = text;
-            checkInputs();
-        })
-        .catch(err => {
-            console.error('Failed to read clipboard contents: ', err);
-        });
-});
-
         document.addEventListener('click', function(event) {
             var isInsideInput = event.target.matches('input, textarea');
             if (!isInsideInput) {
