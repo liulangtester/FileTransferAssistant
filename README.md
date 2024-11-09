@@ -2,7 +2,8 @@
 
 
 脚本打包：
-* pyinstaller --onefile --add-binary 'tools/ffmpeg.exe;.' --add-binary 'tools/ffprobe.exe;.' app.py  --add-data 'templates/;templates'
+* 安装打包依赖：pip install pyinstaller
+* 打包命令：pyinstaller --onefile --add-binary 'tools/ffmpeg.exe;.' --add-binary 'tools/ffprobe.exe;.' app.py  --add-data 'templates/;templates'
 
 
 功能简介：
