@@ -53,12 +53,8 @@ def start_flask():
     flask_thread.start()
 
     # 创建 Tkinter 窗口
-    print("Creating Tkinter window...")
     create_window()
 
-    # 主线程继续运行，避免阻塞
-    # 可以选择等待 Flask 启动后再做其他操作，或保持程序运行
-    flask_thread.join()  # 可选：等待 Flask 线程退出，如果希望在 Flask 完成后退出程序
 
 def create_window():
     # 确保 qr_code_path 是一个有效的文件路径
@@ -89,7 +85,7 @@ def create_window():
     # 创建一个文本输入框，并设置提示文案
     text_entry = tk.Entry(root, width=40)
     # 在文本输入框中插入提示文案
-    text_entry.insert(0, "请输入要发送的文本内容～")
+    text_entry.insert(0, "发送文本内容～")
     text_entry.pack(pady=10)
 
     def send_text():
