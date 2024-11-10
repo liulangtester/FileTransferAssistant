@@ -1,9 +1,16 @@
 背景：平时测试会用到很多台手机，每次要将文件传输到PC端需要使用第三方APP（微信、QQ、如流等）作为媒介传输文件，太麻烦了，也不是每台手机都会安装微信、QQ啥的。我需要的是轻量化的文件传输工具，先去网上找了下，发现有类似的工具，但是如视频需要自动压缩到10M以内等需求还是不能满足，所以决定还是自己写一个~
 
+安装依赖：
+* pip install -r requirements.txt
 
 脚本打包：
 * 安装打包依赖：pip install pyinstaller
-* 打包命令：pyinstaller --onefile --add-binary 'tools/ffmpeg.exe;.' --add-binary 'tools/ffprobe.exe;.' app.py  --add-data 'templates/;templates'
+* 打包命令：
+  * win：不显示控制台
+    * pyinstaller --onefile --windowed --add-binary 'tools/ffmpeg.exe;.' --add-binary 'tools/ffprobe.exe;.' app.py --add-data 'templates/upload.html:templates' --add-data 'templates/download.html:templates'
+  * mac：不显示控制台并且指定应用图标
+    * pyinstaller --onefile --windowed --icon=app_icon.icns --add-binary 'tools/ffmpeg.exe:.' --add-binary 'tools/ffprobe.exe:.' --add-data 'templates/upload.html:templates' --add-data 'templates/download.html:templates' app.py
+
 
 
 功能简介：
@@ -31,7 +38,6 @@
 * 手机访问的页面如下图所示
   * 获取文本并复制：将text.txt文件的内容显示在文本输入框内，并复制文本输入框的内容
   * 复制：复制文本输入框的内容
-  * 粘贴：将剪切板中的内容覆盖粘贴到文本输入框中
   * 删除文本：删除文本输入框中的内容
 
 
@@ -50,14 +56,3 @@
   * PC端将需要传输到手机端的文本内容放入text.txt中
   * 手机端点击获取文本icon，text.txt文件的内容就会显示在文本输入框内，并且自动复制到剪切板
   * 如果自动复制失败，可以手动点击复制icon
-
-使用建议：
-* DOS窗口顶部右键——默认值——选项——编辑选项，取消勾选：快速编辑模式、插入模式
-  * 因为这两项可能会导致DOS窗口卡住，手机端表现是访问页面变成空白页，需要回车一下脚本才会继续运行
-* DOS窗口顶部右键——默认值——布局——窗口大小，高度调到40及以上
-  * 如果要扫码访问的话可以这么设置，因为二维码太大了（暂时做不小~），不方便扫码~
-
-
-问题集锦：
-* 粘贴功能兼容问题：只有uc、夸克可以用，safari、google、firefox、微信均无法使用
-* 上传进度兼容问题：uc、夸克不兼容，会一直显示0%，safari、google、firefox、微信均可正常显示
