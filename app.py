@@ -17,6 +17,7 @@ pc_to_phone = 'pc_to_phone'
 phone_to_pc = 'phone_to_pc'
 url = ''
 qr_code_path = ''
+compress_var = False
 
 if getattr(sys, 'frozen', False):
     current_path = os.path.dirname(sys.executable)
@@ -57,6 +58,8 @@ def start_flask():
 
 
 def create_window():
+    global compress_var
+    compress_var = False
     # 确保 qr_code_path 是一个有效的文件路径
     if not os.path.isfile(qr_code_path):
         print(f"Error: The file {qr_code_path} does not exist.")
@@ -87,6 +90,11 @@ def create_window():
     # 在文本输入框中插入提示文案
     text_entry.insert(0, "发送文本内容～")
     text_entry.pack(pady=10)
+
+    # 创建一个复选框用于选择是否压缩视频
+    compress_var = tk.BooleanVar()
+    compress_checkbox = tk.Checkbutton(root, text="压缩视频", variable=compress_var)
+    compress_checkbox.pack()
 
     def send_text():
         # 获取文本输入框中的内容
@@ -168,6 +176,9 @@ def get_txt():
 
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
+    # 获取压缩选项
+    compress = compress_var.get()
+
     if request.method == 'POST':
         # 获取文件列表
         files = request.files.getlist('file')
@@ -199,6 +210,10 @@ def upload_file():
             print(f'【文本上传 - 成功】 - - 文本内容：{text}')
             # 将文本复制到剪贴板
             pyperclip.copy(text)
+            if compress:
+                # 压缩视频
+                if not video_compress.process_video(file_path):
+                    return '压缩视频异常', 205
 
             return '', 204
         elif files[0] and not text:
@@ -209,8 +224,10 @@ def upload_file():
                 file.save(file_path)
                 print(f'【文件上传 - 成功】 - - 文件路径：{file_path}')
                 print(f'【文件压缩 - 开始】 - - 文件路径：{file_path}')
-                video_compress.process_video(file_path)
-            # print('压缩成功====')
+                if compress:
+                    # 压缩视频
+                    if not video_compress.process_video(file_path):
+                        return '压缩视频异常', 205
             return '', 204
         elif not files[0] and text:
             # 文件列表为空，只上传文本

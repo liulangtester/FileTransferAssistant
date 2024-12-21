@@ -184,46 +184,50 @@ def process_video(input_file):
     :param target_fraction: 目标大小为原始大小的比例（浮点数）
     :return: 处理后的视频的路径（字符串）
     """
-    # 判断是否为视频文件
-    if is_video_file(input_file):
-        # 判断是否>=10MB
-        if os.path.getsize(input_file) >= 10 * 1024 * 1024:
-            # 判断是否为MP4格式
-            if not input_file.endswith('.mp4'):
-                temp_output = os.path.splitext(input_file)[0] + "_temp.mp4"
-                # 转换为MP4格式
-                convert_to_mp4(input_file, temp_output)
-                input_file = temp_output
+    try:
+        # 判断是否为视频文件
+        if is_video_file(input_file):
             # 判断是否>=10MB
             if os.path.getsize(input_file) >= 10 * 1024 * 1024:
-                # 去黑边预处理
-                crop_params = remove_black_borders(input_file)
-                if crop_params:
-                    # 裁剪视频
-                    input_file = apply_crop(input_file, crop_params)
-
+                # 判断是否为MP4格式
+                if not input_file.endswith('.mp4'):
+                    temp_output = os.path.splitext(input_file)[0] + "_temp.mp4"
+                    # 转换为MP4格式
+                    convert_to_mp4(input_file, temp_output)
+                    input_file = temp_output
                 # 判断是否>=10MB
                 if os.path.getsize(input_file) >= 10 * 1024 * 1024:
-                    # 压缩视频
-                    size = get_file_size(input_file)
-                    if size is not None:
-                        if size <= 20:
-                            input_file = compress_video(input_file, 0.5)
-                        elif 20 < size <= 30:
-                            input_file = compress_video(input_file, 10 / size)
-                        elif 30 < size <= 40:
-                            input_file = compress_video(input_file, 10 / size)
-                        else:
-                            input_file = compress_video(input_file, 0.2)
-                    return input_file
+                    # 去黑边预处理
+                    crop_params = remove_black_borders(input_file)
+                    if crop_params:
+                        # 裁剪视频
+                        input_file = apply_crop(input_file, crop_params)
+
+                    # 判断是否>=10MB
+                    if os.path.getsize(input_file) >= 10 * 1024 * 1024:
+                        # 压缩视频
+                        size = get_file_size(input_file)
+                        if size is not None:
+                            if size <= 20:
+                                input_file = compress_video(input_file, 0.5)
+                            elif 20 < size <= 30:
+                                input_file = compress_video(input_file, 10 / size)
+                            elif 30 < size <= 40:
+                                input_file = compress_video(input_file, 10 / size)
+                            else:
+                                input_file = compress_video(input_file, 0.2)
+                        return input_file
+                    else:
+                        # print("视频转换格式及去黑边后文件大小<10M，无需压缩")
+                        return input_file
                 else:
-                    # print("视频转换格式及去黑边后文件大小<10M，无需压缩")
                     return input_file
             else:
-               return input_file
-        else:
-            # print("视频文件小于10M，无需处理")
-            return input_file
+                # print("视频文件小于10M，无需处理")
+                return input_file
+    except Exception as e:
+        print("压缩视频异常", e)
+        return False
 
 # if __name__ == '__main__':
 #     input_file = "phone_to_pc/RPReplay_Final1702747412222.mov"

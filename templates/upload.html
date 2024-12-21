@@ -355,7 +355,14 @@
                         confirmButtonText: '确定',
                         width: '70%' // 设置弹窗大小
                     });
-                } else {
+                }else if (xhr.status === 205) {
+                    Swal.fire({
+                        title: '视频压缩异常',
+                        icon: 'error',
+                        confirmButtonText: '确定',
+                        width: '70%' // 设置弹窗大小
+                    });
+                }else {
                     Swal.fire({
                         title: '上传异常',
                         icon: 'error',
